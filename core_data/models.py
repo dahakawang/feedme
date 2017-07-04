@@ -11,16 +11,9 @@ class Group(models.Model):
         return serializers.serialize("json", [self])
 
 
-class Favicon(models.Model):
-    data = models.TextField()
-
-    def __str__(self):
-        return serializers.serialize("json", [self])
-
-
 class Feed(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
-    favicon = models.ForeignKey(Favicon, on_delete=models.SET_NULL, null=True)
+    group = models.ForeignKey(Group, related_name='feeds', on_delete=models.CASCADE)
+    favicon = models.TextField(null=True)
     title = models.TextField()
     url = models.TextField()
     site_url = models.TextField()
@@ -31,7 +24,7 @@ class Feed(models.Model):
 
 
 class Article(models.Model):
-    feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
+    feed = models.ForeignKey(Feed, related_name='articles', on_delete=models.CASCADE)
     title = models.TextField()
     author = models.TextField()
     html = models.TextField()
@@ -42,3 +35,9 @@ class Article(models.Model):
 
     def __str__(self):
         return serializers.serialize("json", [self])
+
+
+class GroupFeedIdMapping:
+    def __init__(self, group_id, feed_ids):
+        self.group_id = group_id
+        self.feed_ids = feed_ids
