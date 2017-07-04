@@ -15,9 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.http import HttpResponseRedirect
+
+from feedme import settings
 import api.urls
 
 urlpatterns = [
+    url(r'^feedme/$', lambda r: HttpResponseRedirect('/feedme/static/index.html')),
     url(r'^feedme/api/', include(api.urls.urlpatterns)),
     url(r'^feedme/admin/', admin.site.urls),
 ]
