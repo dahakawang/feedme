@@ -1,0 +1,14 @@
+{
+  "proxy": {
+    "url": "http://localhost:1087",
+    "auth": {
+      "login": "",
+      "password": ""
+    },
+    "only_proxy": false
+  },
+  "timeouts": {
+    "read_timeout": 0,
+    "conn_timeout": 0
+  }
+}
