@@ -5,7 +5,7 @@
       "login": "",
       "password": ""
     },
-    "only_proxy": false
+    "proxy_only": false
   },
   "timeouts": {
     "read_timeout": 0,

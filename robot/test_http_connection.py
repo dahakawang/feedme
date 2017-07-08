@@ -20,5 +20,4 @@ class TestHttpConnection:
     @pytest.mark.asyncio
     async def test_request(self):
         resp = await self.conn.request("http://www.google.com")
-        self.conn.close()
         print(resp)
