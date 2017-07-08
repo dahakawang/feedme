@@ -2,3 +2,5 @@ __pycache__
 .DS_store
 .idea
 db.sqlite3
+debug
+node_modules
