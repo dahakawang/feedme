@@ -1,8 +1,6 @@
-import aiohttp
 from collections import namedtuple
-from aiosocks.connector import ProxyConnector, ProxyClientRequest
-from aiohttp import ClientSession, ClientError
-import aiosocks
+from aiosocks.connector import ProxyConnector, ProxyClientRequest, Socks4Auth, Socks5Auth
+from aiohttp import ClientSession, ClientError, BasicAuth
 import logging
 
 HTTPResponse = namedtuple('HTTPResponse',
@@ -18,11 +16,15 @@ class HttpConnection:
     def __init__(self, cfg):
         self.logger = logging.getLogger(__name__)
         self.cfg = cfg
-        self.session = self.proxy_session = None
+        self.session = None
 
         self.proxy_url, self.proxy_auth, self.proxy_only = self._get_auth()
+        self.create_sessions()
 
-    def _create_sessions(self):
+    def create_sessions(self):
+        if self.session:
+            return
+
         con = ProxyConnector(remote_resolve=True)
         session_cfg = dict(raise_for_status=True, connector=con, request_class=ProxyClientRequest)
         session_cfg.update(self.cfg.get('timeouts', {}))
@@ -39,17 +41,22 @@ class HttpConnection:
 
     def _get_proxy_auth(self, url):
         schema = url.split('://')[0]
+        if schema not in {'socks4', 'socks5', 'http'}:
+            raise RuntimeError(f"in valid schema for url {url}")
         if 'auth' not in self.cfg['proxy']:
             return None
-        auth = dict(login='', password='')
+        if schema == "socks4":
+            auth = dict(login='')
+        else:
+            auth = dict(login='', password='')
         auth.update(self.cfg['proxy']['auth'])
 
         if schema == 'socks5':
-            return aiosocks.Socks5Auth(**auth)
+            return Socks5Auth(**auth)
         elif schema == 'socks4':
-            return aiosocks.Socks4Auth(**auth)
+            return Socks4Auth(**auth)
         elif schema == 'http':
-            return aiohttp.BasicAuth(**auth)
+            return BasicAuth(**auth)
         else:
             raise RuntimeError(f"in valid schema for url {url}")
 
@@ -63,8 +70,7 @@ class HttpConnection:
         return url, auth, proxy_only
 
     async def request(self, url, proxy_first=False):
-        if not self.session and not self.proxy_session:
-            self._create_sessions()
+        self.create_sessions()
 
         if not self.proxy_url:
             return await self._request(url)
@@ -92,6 +98,9 @@ class HttpConnection:
     def close(self):
         if self.session:
             self.session.close()
-        if self.proxy_session:
-            self.proxy_session.close()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
