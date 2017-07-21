@@ -4,16 +4,18 @@ from aiohttp import ClientSession, ClientError, BasicAuth
 import logging
 
 HTTPResponse = namedtuple('HTTPResponse',
-                          ['version', 'status', 'reason', 'url', 'cookies', 'content_type', 'charset', 'headers', 'content', 'proxy_used'])
+                          ['version', 'status', 'reason', 'url', 'cookies', 'content_type', 'charset', 'headers',
+                           'content', 'raw', 'proxy_used'])
 
 
 async def _response_to_tuple(response, proxy_used):
     try:
         content = await response.text()
     except UnicodeDecodeError:
-        content = await response.read()
+        pass
+    raw = await response.read()
     return HTTPResponse(response.version, response.status, response.reason, response.url, response.cookies,
-                        response.content_type, response.charset, response.headers, content, proxy_used)
+                        response.content_type, response.charset, response.headers, content, raw, proxy_used)
 
 
 class HttpConnection:

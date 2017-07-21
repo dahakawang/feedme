@@ -17,6 +17,9 @@ class MockResponse:
     async def text(self):
         return ''
 
+    async def read(self):
+        return ''
+
     def __getattr__(self, item):
         return 'mock'
 
