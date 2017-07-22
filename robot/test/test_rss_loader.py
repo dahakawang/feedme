@@ -1,6 +1,6 @@
 import pytest
-from .http_connection import HttpConnection
-from .rss_loader import *
+from robot.http_connection import HttpConnection
+from robot.rss_loader import *
 
 
 class TestRSSLoader:
