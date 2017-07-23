@@ -50,7 +50,7 @@ class RSSLoader:
 
     def _sanity_check(self):
         feed = self.feed
-        if not (feed and 'title' in feed.feed and not feed.feed.entries):
+        if not (feed and 'title' in feed.feed and feed.entries):
             raise InvalidRss("The documents lacks necessary tags, it may be an invalid RSS")
 
 
