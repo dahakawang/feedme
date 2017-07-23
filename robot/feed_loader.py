@@ -30,7 +30,7 @@ class RSSLoader:
         parsed_tree = etree.fromstring(content, parser=parser)
 
         if parsed_tree is None:
-            raise InvalidRss("invalid xml format")
+            raise InvalidRssError("invalid xml format")
         return etree.tostring(parsed_tree)
 
     async def description(self):
@@ -51,6 +51,6 @@ class RSSLoader:
     def _sanity_check(self):
         feed = self.feed
         if not (feed and 'title' in feed.feed and feed.entries):
-            raise InvalidRss("The documents lacks necessary tags, it may be an invalid RSS")
+            raise InvalidRssError("The documents lacks necessary tags, it may be an invalid RSS")
 
 

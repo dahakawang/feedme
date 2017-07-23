@@ -8,5 +8,9 @@ class RobotError(RuntimeError):
     pass
 
 
-class InvalidRss(RobotError):
+class InvalidRssError(RobotError):
+    pass
+
+
+class InvalidConfigError(RobotError):
     pass

@@ -37,12 +37,12 @@ class TestRSSLoader:
 
     @pytest.mark.asyncio
     async def test_with_invalid_rss(self):
-        with pytest.raises(InvalidRss):
+        with pytest.raises(InvalidRssError):
             connection = MockConnection('fixture/proxies.json')
             loader = RSSLoader(connection, 'http://sample.com/sub/rss/feed.xml')
             await loader.description()
 
-        with pytest.raises(InvalidRss):
+        with pytest.raises(InvalidRssError):
             connection = MockConnection('fixture/data.xml')
             loader = RSSLoader(connection, 'http://sample.com/sub/rss/feed.xml')
             await loader.description()
