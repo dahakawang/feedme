@@ -2,7 +2,7 @@ import feedparser
 import time
 from lxml import etree
 from urllib.parse import urlparse
-from .data import *
+from .common import *
 
 
 def _extract_publish_time(entry):
