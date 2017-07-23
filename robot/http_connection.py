@@ -1,6 +1,7 @@
 from collections import namedtuple
 from aiosocks.connector import ProxyConnector, ProxyClientRequest, Socks4Auth, Socks5Auth
 from aiohttp import ClientSession, ClientError, BasicAuth
+from .common import *
 import logging
 
 HTTPResponse = namedtuple('HTTPResponse',
@@ -39,16 +40,16 @@ class HttpConnection:
 
     def _get_proxy_url(self):
         if 'url' not in self.cfg['proxy']:
-            raise RuntimeError("proxy have no url configured")
+            raise InvalidConfigError("proxy have no url configured")
         url = self.cfg['proxy']['url']
         if not isinstance(url, str):
-            raise RuntimeError("proxy url should be string")
+            raise InvalidConfigError("proxy url should be string")
         return url
 
     def _get_proxy_auth(self, url):
         schema = url.split('://')[0]
         if schema not in {'socks4', 'socks5', 'http'}:
-            raise RuntimeError(f"in valid schema for url {url}")
+            raise InvalidConfigError(f"in valid schema for url {url}")
         if 'auth' not in self.cfg['proxy']:
             return None
         if schema == "socks4":
@@ -64,7 +65,7 @@ class HttpConnection:
         elif schema == 'http':
             return BasicAuth(**auth)
         else:
-            raise RuntimeError(f"in valid schema for url {url}")
+            raise InvalidConfigError(f"in valid schema for url {url}")
 
     def _get_auth(self):
         if 'proxy' not in self.cfg:
