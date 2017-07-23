@@ -1,6 +1,6 @@
 import pytest
 import time
-from robot.rss_loader import *
+from robot.feed_loader import *
 
 
 class MockConnection:
