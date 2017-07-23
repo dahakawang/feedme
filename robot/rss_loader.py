@@ -22,11 +22,15 @@ class RSSLoader:
 
         self.content = await self._request()
         self.feed = feedparser.parse(self.content)
+        self._sanity_check()
 
     async def _request(self):
         content = (await self.conn.request(self.url.geturl())).raw
         parser = etree.XMLParser(ns_clean=True, recover=True)
         parsed_tree = etree.fromstring(content, parser=parser)
+
+        if parsed_tree is None:
+            raise InvalidRss("invalid xml format")
         return etree.tostring(parsed_tree)
 
     async def description(self):
@@ -43,4 +47,10 @@ class RSSLoader:
 
         for entry in self.feed.entries:
             yield FeedItem(entry.title, entry.link, _extract_publish_time(entry))
+
+    def _sanity_check(self):
+        feed = self.feed
+        if not (feed and 'title' in feed.feed and not feed.feed.entries):
+            raise InvalidRss("The documents lacks necessary tags, it may be an invalid RSS")
+
 
