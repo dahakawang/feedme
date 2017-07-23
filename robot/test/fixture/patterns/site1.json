@@ -1,0 +1,21 @@
+[
+  {
+    "url": "www.cnbeta.com",
+    "feed": {
+      "title": "cnBeta.COM_中文业界资讯站",
+      "item": {
+        "sel": ".main-wrap .cnbeta-update .items-area div.item",
+        "title": {"sel": "dt", "attr": "$text"},
+        "link": {"sel": "dt", "attr": "href"},
+        "update_time": {"sel": ".meta-data .status li", "attr": "$text","capture": ["发布于([\\d-]+ [\\d:]+) | [\\d]+次阅读 | [\\d]+个意见"], "date-format": ""}
+      }
+    },
+    "article": {
+    }
+  },
+  {
+    "url": "www.matrix67.com",
+    "article": {
+    }
+  }
+]
