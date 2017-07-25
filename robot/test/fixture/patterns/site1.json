@@ -4,10 +4,10 @@
     "feed": {
       "title": "cnBeta.COM_中文业界资讯站",
       "item": {
-        "sel": ".main-wrap .cnbeta-update .items-area div.item",
-        "title": {"sel": "dt", "attr": "$text"},
-        "link": {"sel": "dt", "attr": "href"},
-        "update_time": {"sel": ".meta-data .status li", "attr": "$text","capture": ["发布于([\\d-]+ [\\d:]+) | [\\d]+次阅读 | [\\d]+个意见"], "date-format": ""}
+        "sel": "//div/div/div/div[@class='items-area']/div[contains(@class, 'item') and not(contains(@class, 'cooperation'))]",
+        "title": {"sel": "dl/dt/a/text()"},
+        "link": {"sel": "dl/dt/a/@href"},
+        "update_time": {"sel": "div[@class='meta-data']/ul/li/text()", "capture": "发布于([\\d-]+ [\\d:]+)\\s|\\s[\\d]+次阅读\\s|\\s[\\d]+个意见", "date-format": "%Y-%m-%d %H:%M"}
       }
     },
     "article": {

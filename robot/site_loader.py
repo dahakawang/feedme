@@ -1,7 +1,36 @@
 import os
+import re
 import json
+import time
+from lxml import etree
 from .common import *
 from urllib.parse import urlparse
+
+
+def _select_all(root, selector):
+    return root.xpath(selector)
+
+
+def _select_one(root, selector):
+    rs = _select_all(root, selector)
+    if len(rs) != 1:
+        raise InvalidPatternError("the matched tag should be exactly one")
+    return rs[0]
+
+
+def _capture(text, cfg):
+    text = str(text)
+    match = re.search(cfg, text)
+    if len(match.groups()) != 1:
+        raise InvalidPatternError("the capture should only have one group")
+    return match[1]
+
+
+def _to_datetime(string, pattern):
+    try:
+        return time.strptime(string, pattern)
+    except ValueError:
+        raise InvalidPatternError("the datetime format is not valid")
 
 
 class SiteLoader:
@@ -16,8 +45,43 @@ class SiteLoader:
         return Feed('', self.patterns['title'], self.url.geturl(), site_url, None)
 
     async def __aiter__(self):
-        yield
+        await self._load_content()
+        articles = self._get_list()
+        for article in articles:
+            yield article
 
+    async def _load_content(self):
+        resp = await self.conn.request(self.url.geturl())
+        if not resp.content:
+            raise InvalidWebSiteError('this url contains no valid html')
+        self.html = etree.fromstring(resp.content, parser=etree.HTMLParser(recover=True))
+
+    def _get_list(self):
+        item_list = []
+        item_sel = self.patterns['item']['sel']
+
+        for item_elem in _select_all(self.html, item_sel):
+            item_list.append(self._get_item(item_elem))
+        return item_list
+
+    def _get_item(self, item_elem):
+        title = self._get_field(item_elem, 'title')
+        link = self._get_field(item_elem, 'link')
+        update_time = self._get_field(item_elem, 'update_time')
+
+        return FeedItem(title, link, update_time)
+
+    def _get_field(self, root, field_name):
+        cfg = self.patterns['item'][field_name]
+        sel = cfg['sel']
+
+        result = _select_one(root, sel)
+
+        if 'capture' in cfg:
+            result = _capture(result, cfg['capture'])
+        if 'date-format' in cfg:
+            result = _to_datetime(result, cfg['date-format'])
+        return result
 
 
 class SiteLoaderManager:

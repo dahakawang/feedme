@@ -12,5 +12,13 @@ class InvalidRssError(RobotError):
     pass
 
 
+class InvalidWebSiteError(RobotError):
+    pass
+
+
+class InvalidPatternError(RobotError):
+    pass
+
+
 class InvalidConfigError(RobotError):
     pass
